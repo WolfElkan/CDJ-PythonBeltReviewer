@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Welcome</title>
+		{% load staticfiles %}
+		<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+		<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	</head>
+	<body>
+		<h1>Book Review</h1>
+		<div>
+			<h2>Login</h2>
+			<form method="post">
+				{% csrf_token %}
+				<input type="hidden" name="operation" value="Log">
+				<table>
+					<tr>
+						<td>Email:</td>
+						<td>
+							<input type="text" name="email" value="{{log.email.p}}">
+						</td>
+						<td>
+							<span class="error">{{log.email.e}}</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Password:</td>
+						<td>
+							<input type="password" name="password" value="{{log.password.p}}">
+						</td>
+						<td>
+							<span class="error">{{log.password.e}}</span>
+						</td>
+					</tr>
+				</table>
+				<input type="submit" value="Login">
+			</form>
+		</div>
+		<div>
+			<h2>Register</h2>
+			<form method="post">
+				{% csrf_token %}
+				<input type="hidden" name="operation" value="Reg">
+				<table>
+					<tr>
+						<td>Name:</td>
+						<td>
+							<input type="text" name="name" value="{{reg.name.p}}">
+						</td>
+						<td>
+							<span class="error">{{reg.name.e}}</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Alias:</td>
+						<td>
+							<input type="text" name="alias" value="{{reg.alias.p}}">
+						</td>
+						<td>
+							<span class="error">{{reg.alias.e}}</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Email:</td>
+						<td>
+							<input type="text" name="email" value="{{reg.email.p}}">
+						</td>
+						<td>
+							<span class="error">{{reg.email.e}}</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Password:</td>
+						<td>
+							<input type="password" name="password">
+						</td>
+						<td>
+							<span class="error">{{reg.password.e}}</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Confirm Password:</td>
+						<td>
+							<input type="password" name="password_conf">
+						</td>
+						<td>
+							<span class="error">{{reg.password_conf.e}}</span>
+						</td>
+					</tr>
+				</table>
+				<input type="submit" value="Sign Up!">
+			</form>
+		</div>
+	</body>
+</html>
