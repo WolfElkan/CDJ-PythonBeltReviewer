@@ -155,8 +155,8 @@ def books_index(request):
 	me = User.objects.get(id = request.session['user_id'])
 	context = {
 		'alias'  : me.alias,
-		'recent' : [],
-		'others' : [],
+		'recent' : Review.objects.all(),
+		'others' : Book.objects.all(),
 	}
 	return render(request, 'main/books.html', context)
 

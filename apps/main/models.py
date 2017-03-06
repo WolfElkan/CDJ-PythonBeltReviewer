@@ -47,14 +47,20 @@ class Author(models.Model):
 
 class Book(models.Model):
 	title = models.CharField(max_length=40)
-	rating = models.PositiveSmallIntegerField()
 	author = models.ForeignKey(Author)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 
 class Review(models.Model):
 	review = models.TextField()
+	rating = models.PositiveSmallIntegerField()
 	book = models.ForeignKey(Book)
 	user = models.ForeignKey(User)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	def stars(self):
+		result = ""
+		for x in xrange(self.rating):
+		 	result += "&#x2b50; "
+		return result
+
