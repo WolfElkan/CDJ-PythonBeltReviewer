@@ -44,12 +44,22 @@ def nuke(request):
 	#.objects.all().delete()
 	return redirect ('/hot')
 
+# - - - - - SECURITY FUNCTIONS - - - - -
+
+def secure_session(request, user_id):
+	request.session['user_id'] = user_id
+
+def authentic(request):
+	return bool(request.session['user_id'])
+
 # - - - - - APPLICATION VIEWS - - - - -
+
+# - - - - LOGIN & REGISTRATION - - - -
 
 def index(request):
 	seshinit(request,'user_id',None)
-	if request.session['user_id']:
-		return access(request)
+	if authentic(request):
+		return redirect('/books')
 	else:
 		return entrance(request)
 
@@ -93,11 +103,12 @@ def register(request):
 	fields = ['name','alias','email','password','password_conf']
 	new_user = copy(request.POST,fields)
 	if User.objects.isValid(new_user):
-		return users_create(request, new_user)
+		users_create(request, new_user)
+		return index(request)
 	else:
 		for f in fields:
-			message = ""
 			errors = User.objects.errors(new_user, f)
+			message = ""
 			for e in errors:
 				if message:
 					message += ", "
@@ -131,11 +142,28 @@ def users_create(request, new_user):
 		pw_hash = encrypted_password
 	)
 	secure_session(request, me.id)
-	return index(request)
 
-def secure_session(request, user_id):
-	request.session['user_id'] = user_id
+def logout(request):
+	request.session.clear()
+	return redirect('/')
 
-def access(request):
-	print "Successfully logged in as User #{}".format(request.session['user_id'])
-	return entrance_get(request)
+# - - - - BOOK REVIEWS - - - -
+
+def books_index(request):
+	if not authentic(request):
+		return redirect('/')
+	me = User.objects.get(id = request.session['user_id'])
+	context = {
+		'alias'  : me.alias,
+		'recent' : [],
+		'others' : [],
+	}
+	return render(request, 'main/books.html', context)
+
+
+
+
+
+
+
+
