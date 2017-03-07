@@ -286,10 +286,21 @@ def reviews_delete(request, id):
 		review.delete()
 	return books_show_get(request, id)
 
+# - - - - USERS - - - -
 
-
-
-
-
-
-
+def users_show(request, id):
+	if not authentic(request):
+		return redirect('/')
+	them = User.objects.get(id = id)
+	reviews = Review.objects.filter(user=them)
+	books = []
+	for review in reviews:
+		books += [review.book]
+	context = {
+		'alias'    : them.alias,
+		'name'     : them.name,
+		'email'    : them.email,
+		'nReviews' : len(reviews),
+		'books'    : set(books),
+	}
+	return render(request, "main/users_show.html", context)
