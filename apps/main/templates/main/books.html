@@ -12,10 +12,10 @@
 		<div style="display: inline-block; width: 65%">
 			<h2>Recent Book Reviews:</h2>
 			{% for review in recent %}
-			<div class="book_review">
+			<div style="padding: 10px;" class="book_review">
 				<a href="books/{{review.book.id}}">{{review.book.title}}</a><br>
 				<span>Rating: {{review.stars|safe}}</span>
-				<p>
+				<p style="margin: 4px">
 					<a href="/users/{{review.user.id}}">{{review.user.alias}}</a> says:
 					{{review.review}}
 				</p>
@@ -29,7 +29,7 @@
 			<h2>Other Books with Reviews:</h2>
 			<div style="border: solid black 1px; overflow: scroll; height: 150px; padding: 5px">
 				{% for book in others %}
-				<a href="/books/{{book.id}}">{{book.title}}</a>
+				<a style="display: block;" href="/books/{{book.id}}">{{book.title}}</a>
 				{% endfor %}
 			</div>
 		</div>

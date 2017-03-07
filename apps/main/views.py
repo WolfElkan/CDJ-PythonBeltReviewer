@@ -10,6 +10,12 @@ def seshinit(request, sesh, val=''):
 	if sesh not in request.session:
 		request.session[sesh] = val
 
+def forminit(request, form_name, fields):
+	blank = {}
+	for f in fields:
+		blank[f] = {'p':"", 'e':""}
+	seshinit(request, form_name, blank)
+
 def first(arr):
 	if len(arr) == 0:
 		return None
@@ -23,6 +29,11 @@ def copy(source, keys=False):
 	for key in keys:
 		this[key] = source[key]
 	return this
+
+def select_array(model, num):
+	length = model.objects.all().last().id
+	array = list([""] * length)
+	array[num] = "selected"
 
 # - - - - - DEVELOPER VIEWS - - - - -
 
@@ -73,17 +84,8 @@ def entrance(request):
 		return index(request)
 
 def entrance_get(request):
-	seshinit(request,'log',{
-		'email':         {'p':"", 'e':""},
-		'password':      {'p':"", 'e':""},
-	})
-	seshinit(request,'reg',{
-		'name':          {'p':"", 'e':""},
-		'alias':         {'p':"", 'e':""},
-		'email':         {'p':"", 'e':""},
-		'password':      {'p':"", 'e':""},
-		'password_conf': {'p':"", 'e':""},
-	})
+	forminit(request,'log',['email','password'])
+	forminit(request,'reg',['name','alias','email','password','password_conf',])
 	context = {
 		'log': request.session['log'],
 		'reg': request.session['reg'],
@@ -159,6 +161,69 @@ def books_index(request):
 		'others' : Book.objects.all(),
 	}
 	return render(request, 'main/books.html', context)
+
+def books_new(request):
+	if not authentic(request):
+		return redirect('/')
+	elif request.method == "GET":
+		return books_new_get(request)
+	elif request.method == "POST":
+		return books_new_post(request)
+	else:
+		print "Unrecognized HTTP Verb"
+		return redirect('/')
+
+def books_new_get(request):
+	forminit(request,'new_book',['title','author_new','review','rating'])
+	context = {
+		'authors' : Author.objects.all(),
+		'form' : request.session['new_book']
+	}
+	return render(request, 'main/books_new.html', context)
+
+def books_new_post(request):
+	me = User.objects.get(id = request.session['user_id'])
+	new_author = None
+	if request.POST['author_id'] != "0":
+		new_author = Author.objects.get(id=int(request.POST['author_id']))
+		author_valid = True
+	else:
+		author_valid = len(request.POST['author_new']) <= 40
+	book_valid = len(request.POST['author_new']) <= 40
+	rating_valid = 1 <= int(request.POST['rating']) <= 5
+
+	if not author_valid:
+		request.session['new_book']['author_new']['e'] = "Author name is too long.  Max is 40 characters"
+	else:
+		request.session['new_book']['author_new']['e'] = ""
+
+	if not book_valid:
+		request.session['new_book']['title']['e'] = "Book title is too long.  Max is 40 characters"
+	else:
+		request.session['new_book']['title']['e'] = ""
+
+	if not rating_valid:
+		request.session['new_book']['rating']['e'] = "Please add a 1-5 star rating to your review"
+	else:
+		request.session['new_book']['rating']['e'] = ""
+
+	if author_valid and book_valid and rating_valid:
+		if not new_author:
+			new_author = Author.objects.create(name=request.POST['author_new'])
+		new_book = Book.objects.create(title=request.POST['title'],author=new_author)
+		new_review = Review.objects.create(
+			review = request.POST['review'],
+			rating = request.POST['rating'],
+			book   = new_book,
+			user   = me,
+		)
+		return redirect('/books/{}'.format(new_book.id))
+	else:
+		request.session['new_book']['title']     ['p'] = request.POST['title']
+		request.session['new_book']['author_new']['p'] = request.POST['author_new']
+		request.session['new_book']['review']    ['p'] = request.POST['review']
+		return books_new_get(request)
+
 
 
 

@@ -11,9 +11,9 @@ class UserManager(models.Manager):
 		self._hints = {}
 		self.validations = [
 			sm.Validation('name'    , r'.+'      , "Please enter your name"),
-			sm.Validation('name'    , r'^.{,40}$', "Name is too long.  Max 40 characters"),
+			sm.Validation('name'    , r'^.{,40}$', "Name is too long.  Max is 40 characters"),
 			sm.Validation('alias'   , r'.+'      , "Please enter an alias"),
-			sm.Validation('alias'   , r'^.{,40}$', "Alias is too long.  Max 40 characters"),
+			sm.Validation('alias'   , r'^.{,40}$', "Alias is too long.  Max is 40 characters"),
 			sm.Validation('email'   , r'.+'      , "Please enter your email address"),
 			sm.Validation('email'   , r'^[\w+-.]+@[\w+-.]+\.[\w]+$', "Email is not valid."),
 			sm.Validation('password', r'.{8,}'   , "Password should be at least 8 characters"),
@@ -45,11 +45,33 @@ class Author(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
 
+class BookManager(models.Manager):
+	def __init__(self):
+		self.name   = 'objects'
+		self._db    = None
+		self._hints = {}
+		self.validations = [
+			sm.Validation('title', r'^.{,40}$', "Title is too long.  Max 40 characters"),
+			sm.Validation('author', r'^.{,40}$', "Title is too long.  Max 40 characters"),
+		]
+	def isValid(self, data):
+		valid = True
+		for v in self.validations:
+			valid &= v.isValid(data)
+		return valid
+	def errors(self, data, field=None):
+		messages = []
+		for v in self.validations:
+			if field == v.field or field == None:
+				messages = v.errors(data, messages)
+		return messages
+
 class Book(models.Model):
 	title = models.CharField(max_length=40)
 	author = models.ForeignKey(Author)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	objects = BookManager()
 
 class Review(models.Model):
 	review = models.TextField()

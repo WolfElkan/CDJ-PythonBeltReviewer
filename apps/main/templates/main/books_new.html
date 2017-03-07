@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Books Home</title>
+		{% load staticfiles %}
+		<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+		<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	</head>
+	<body>
+	<div>
+		<a href="/books">Home</a>
+		<a href="/logout">Logout</a>
+	</div>
+	<h2>Add a New Book Title and a Review:</h2>
+	<form method="post">
+	{% csrf_token %}
+		<div><b>Book Title:</b><input type="text" name="title" value="{{form.title.p}}"></div>
+		<span class="error">{{form.title.e}}</span>
+		<div>
+			<b>Author:</b>
+			<table>
+				<tr>
+					<td>Choose from the list:</td>
+					<td>
+						<select name="author_id">
+							<option value="0">Authors</option>
+							{% for author in authors %}
+							<option value="{{author.id}}">{{author.name}}</option>
+							{% endfor %}
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>Or add a new author</td>
+					<td><input type="text" name="author_new" value="{{form.author_new.p}}"></td>
+					<td><span class="error">{{form.author_new.e}}</span></td>
+				</tr>
+			</table>
+			<table>
+				<tr>
+					<td><b>Review:</b></td>
+					<td><textarea name="review">{{form.review.p}}</textarea></td>
+					<td><span class="error">{{form.review.e}}</span></td>
+				</tr>
+			</table>
+			<b>Rating:</b>
+			<select name="rating">
+				<option value="0"></option>
+				<option value="1">&#x2b50;</option>
+				<option value="2">&#x2b50;&#x2b50;</option>
+				<option value="3">&#x2b50;&#x2b50;&#x2b50;</option>
+				<option value="4">&#x2b50;&#x2b50;&#x2b50;&#x2b50;</option>
+				<option value="5">&#x2b50;&#x2b50;&#x2b50;&#x2b50;&#x2b50;</option>
+			</select>
+			<span class="error">{{form.rating.e}}</span>
+		</div>
+		<input type="submit" value="Add Book and Review">
+	</form>
+	</body>
+</html>
