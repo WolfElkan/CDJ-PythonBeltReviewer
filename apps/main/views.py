@@ -275,6 +275,18 @@ def books_show_post(request, id):
 		request.session['new_review']['review']['p'] = request.POST['review']
 	return books_show_get(request, id)
 
+# - - - - REVIEWS - - - -
+
+def reviews_delete(request, id):
+	if not authentic(request):
+		return redirect('/')
+	me = User.objects.get(id = request.session['user_id'])
+	review = Review.objects.get(id=id)
+	if review.user == me:
+		review.delete()
+	return books_show_get(request, id)
+
+
 
 
 
