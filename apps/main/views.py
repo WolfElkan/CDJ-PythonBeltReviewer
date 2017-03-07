@@ -149,7 +149,7 @@ def logout(request):
 	request.session.clear()
 	return redirect('/')
 
-# - - - - BOOK REVIEWS - - - -
+# - - - - BOOKS - - - -
 
 def books_index(request):
 	if not authentic(request):
@@ -161,6 +161,8 @@ def books_index(request):
 		'others' : Book.objects.all(),
 	}
 	return render(request, 'main/books.html', context)
+
+# - - - BOOKS NEW - - -
 
 def books_new(request):
 	if not authentic(request):
@@ -224,7 +226,54 @@ def books_new_post(request):
 		request.session['new_book']['review']    ['p'] = request.POST['review']
 		return books_new_get(request)
 
+# - - - BOOKS SHOW - - -
 
+def books_show(request, id):
+	if not authentic(request):
+		return redirect('/')
+	elif request.method == "GET":
+		return books_show_get(request, id)
+	elif request.method == "POST":
+		return books_show_post(request, id)
+	else:
+		print "Unrecognized HTTP Verb"
+		return redirect('/')
+
+def books_show_get(request, id):
+	forminit(request,'new_review',['review','rating'])
+	me = User.objects.get(id = request.session['user_id'])
+	book = Book.objects.get(id=id)
+	reviews = Review.objects.filter(book=book)
+	for review in reviews:
+		if review.user == me:
+			review.delete_link = "/reviews/delete/{}".format(review.id)
+			review.delete_text = "Delete this review"
+		else:
+			review.delete_link = "#"
+			review.delete_text = ""		
+	context = {
+		'title'  : book.title,
+		'author' : book.author.name,
+		'reviews': reviews,
+		'form'   : request.session['new_review'],
+	}
+	return render(request, "main/books_show.html", context)
+
+def books_show_post(request, id):
+	me = User.objects.get(id = request.session['user_id'])
+	book = Book.objects.get(id=id)
+	if 1 <= int(request.POST['rating']) <= 5:
+		request.session['new_review']['rating']['e'] = ""
+		Review.objects.create(
+			review = request.POST['review'],
+			rating = request.POST['rating'],
+			book   = book,
+			user   = me,
+		)
+	else:
+		request.session['new_review']['rating']['e'] = "Please add a 1-5 star rating to your review"
+		request.session['new_review']['review']['p'] = request.POST['review']
+	return books_show_get(request, id)
 
 
 

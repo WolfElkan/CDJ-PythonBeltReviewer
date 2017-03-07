@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Add Book and Review</title>
+		{% load staticfiles %}
+		<script src="{% static 'main/js/script.js' %}" charset="utf-8"></script>
+		<link rel="stylesheet" type="text/css" href="{% static 'main/css/style.css' %}">
+	</head>
+	<body>
+		<div>
+			<div style="text-align: right;">
+				<a href="/books">Home</a>
+				<a href="/logout">Logout</a>
+			</div>
+			<h2>{{title}}</h2>
+			Author: {{author}}
+		</div>
+		<div style="display: inline-block; width: 65%">
+			<h3>Reviews:</h3>
+			{% for review in reviews %}
+				<hr>
+				Rating: {{review.stars|safe}}
+				<p>
+					<a href="/users/{{review.user.id}}">{{review.user.alias}}</a> says:
+					{{review.review}}
+				</p>
+				Posted on: {{review.created_at}}
+				<a href="{{review.delete_link}}">{{review.delete_text}}</a>
+			{% endfor %}
+		</div>
+		<div style="display: inline-block; width: 30%">
+			<h3>Add a Review:</h3>
+			<form method="post">{% csrf_token %}
+				<div>
+					<textarea name="review">{{form.review.p}}</textarea>
+					<span class="error">{{form.review.e}}</span>
+				</div>
+				<div>
+					Rating:
+					<select name="rating">
+						<option value="0"></option>
+						<option value="1">&#x2b50;</option>
+						<option value="2">&#x2b50;&#x2b50;</option>
+						<option value="3">&#x2b50;&#x2b50;&#x2b50;</option>
+						<option value="4">&#x2b50;&#x2b50;&#x2b50;&#x2b50;</option>
+						<option value="5">&#x2b50;&#x2b50;&#x2b50;&#x2b50;&#x2b50;</option>
+					</select>
+					<span class="error">{{form.rating.e}}</span>
+				</div>
+				<div>
+					<input type="submit" value="Submit Review">
+				</div>
+			</form>
+		</div>
+	</body>
+</html>

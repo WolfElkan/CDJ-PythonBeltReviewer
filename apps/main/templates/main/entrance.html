@@ -11,8 +11,7 @@
 		<h1>Book Review</h1>
 		<div>
 			<h2>Login</h2>
-			<form method="post">
-				{% csrf_token %}
+			<form method="post">{% csrf_token %}
 				<input type="hidden" name="operation" value="Log">
 				<table>
 					<tr>
